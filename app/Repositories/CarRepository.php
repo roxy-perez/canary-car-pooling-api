@@ -14,7 +14,7 @@ class CarRepository implements CarRepositoryInterface
 
     public function getById($id)
     {
-        return Car::find($id);
+        return Car::findOrFail($id);
     }
 
     public function getByUser($userId)
@@ -29,7 +29,7 @@ class CarRepository implements CarRepositoryInterface
 
     public function update(array $data, $id)
     {
-        return Car::find($id)->update($data);
+        return Car::findOrFail($id)->update($data);
     }
 
     public function delete($id)

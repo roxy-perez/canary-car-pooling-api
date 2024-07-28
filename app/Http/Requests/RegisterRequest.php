@@ -23,7 +23,7 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+            'full_name' => 'required|string|min:10|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => [
                 'required',
@@ -36,7 +36,9 @@ class RegisterRequest extends FormRequest
                     ->symbols()
                     ->uncompromised(),
             ],
-            'phone_number' => 'sometimes|string|nullable|max:15',
+            'contact_number' => 'sometimes|string|nullable|max:15',
+            'driving_license_number' => 'required|string|max:50',
+            'driving_license_valid_from' => 'required|date',
             'profile_picture' => 'sometimes|image|nullable',
         ];
     }

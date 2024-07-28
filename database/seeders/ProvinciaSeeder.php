@@ -13,6 +13,8 @@ class ProvinciaSeeder extends Seeder
      */
     public function run(): void
     {
+        Provincia::truncate();
+
         Provincia::create([
             'code' => '35',
             'name' => 'Las Palmas',

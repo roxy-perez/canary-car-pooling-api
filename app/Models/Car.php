@@ -10,24 +10,35 @@ class Car extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
+        'year',
         'make',
         'model',
-        'year',
+        'body_styles',
+        'comfort_level',
     ];
 
-    public function getComfortLevelAttribute()
+    /**
+     * Set the body styles as a JSON string.
+     *
+     * @param array $value
+     */
+    public function setBodyStylesAttribute($value)
     {
-        // Definimos la lógica para calcular el comfort level
-        // Por ejemplo, si es un modelo de lujo, el comfort level será alto
-        if ($this->model === 'Lexus' || $this->model === 'Mercedes-Benz') {
-            return 5; // Alto comfort level
-        } elseif (in_array($this->model, ['Toyota', 'Honda', 'Ford'])) {
-            return 3; // Medio comfort level
-        } else {
-            return 1; // Bajo comfort level
-        }
+        $this->attributes['body_styles'] = json_encode($value);
     }
 
-    protected $appends = ['comfort_level'];
+    public function getFullCarNameAttribute()
+    {
+        return "{$this->make} {$this->model}";
+    }
+
+    /**
+     * Mutator para formatear correctamente el año.
+     */
+    public function setYearAttribute($value)
+    {
+        $this->attributes['year'] = (int)$value;
+    }
+
+    protected $appends = ['car_name'];
 }

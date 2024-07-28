@@ -64,13 +64,13 @@ class AuthController extends Controller
 
         return response()->json([
             'user' => new UserResource($user),
+            'token' => $token,
         ])->withCookie($cookie);
     }
 
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
-
         $cookie = cookie()->forget('token');
 
         return response()->json([

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Car;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class CarSeeder extends Seeder
 {
@@ -16,48 +17,76 @@ class CarSeeder extends Seeder
         // Truncate the cars table to clear any existing data
         Car::truncate();
 
-        // Path to the CSV file
-        $csvFile = database_path('data/cars.csv');
+        // Path to the CSV files directory
+        $csvDirectory = database_path('data/cars');
 
-        // Check if the file exists before opening
-        if (!file_exists($csvFile) || !is_readable($csvFile)) {
-            Log::error("CSV file not found or not readable: $csvFile");
-            return;
-        }
+        // Get all CSV files in the directory
+        $csvFiles = glob($csvDirectory . '/*.csv');
 
-        // Open the CSV file for reading
-        if (($csv = fopen($csvFile, 'r')) !== false) {
-            $firstline = true;
+        DB::beginTransaction();
 
-            // Read each row of the CSV file
-            while (($row = fgetcsv($csv)) !== false) {
-                // Skip the first line (header) of the CSV file
-                if ($firstline) {
-                    $firstline = false;
-                    continue;
-                }
+        try {
+            foreach ($csvFiles as $csvFile) {
+                // Open the CSV file for reading
+                if (($csv = fopen($csvFile, 'r')) !== false) {
+                    $firstline = true;
 
-                // Check if the row has the expected number of columns
-                if (count($row) >= 5) {
-                    // Create a new car record in the database
-                    Car::create([
-                        'name' => $row[0],
-                        'make' => $row[1],
-                        'model' => $row[2],
-                        'year' => $row[3],
-                        'comfort_level' => $row[4],
-                    ]);
+                    // Read each row of the CSV file
+                    while (($row = fgetcsv($csv)) !== false) {
+                        // Skip the first line (header) of the CSV file
+                        if ($firstline) {
+                            $firstline = false;
+                            continue;
+                        }
+
+                        // Check if the row has the expected number of columns
+                        if (count($row) >= 4) {
+                            // Create a new car record in the database
+                            Car::create([
+                                'year' => $row[0],
+                                'make' => $row[1],
+                                'model' => $row[2],
+                                'body_styles' => $row[3],
+                                'comfort_level' => $this->determineComfortLevel($row[2])
+                            ]);
+                        } else {
+                            // Handle the case where there are not enough columns in the row
+                            Log::warning('Not enough columns in row: ' . implode(',', $row));
+                        }
+                    }
+
+                    // Close the CSV file
+                    fclose($csv);
                 } else {
-                    // Handle the case where there are not enough columns in the row
-                    // For example, you could log a warning message
-                    Log::warning('Not enough columns in row: ' . implode(',', $row));
+                    Log::error("Failed to open CSV file: $csvFile");
                 }
             }
 
-            // Close the CSV file
-            fclose($csv);
+            DB::commit();
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            Log::error("Failed to seed cars table: " . $ex->getMessage());
+        }
+    }
+
+    /**
+     * Determine the comfort level for a car model.
+     *
+     * @param string $model
+     * @return int
+     */
+    private function determineComfortLevel(string $model): int
+    {
+        // Define comfort level logic
+        $luxuryModels = ['Lexus', 'Mercedes-Benz', 'BMW', 'Audi', 'Tesla'];
+        $midRangeModels = ['Toyota', 'Honda', 'Ford', 'Chevrolet', 'Nissan'];
+
+        if (in_array($model, $luxuryModels)) {
+            return 5;
+        } elseif (in_array($model, $midRangeModels)) {
+            return 3;
         } else {
-            Log::error("Failed to open CSV file: $csvFile");
+            return 1;
         }
     }
 }

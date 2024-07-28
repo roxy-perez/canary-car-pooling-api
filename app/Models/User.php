@@ -18,10 +18,12 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'full_name',
         'email',
         'password',
-        'phone_number',
+        'contact_number',
+        'driving_license_number',
+        'driving_license_valid_from',
         'profile_picture',
     ];
 
@@ -37,7 +39,6 @@ class User extends Authenticatable
 
     /**
      * Get the attributes that should be cast.
-     *
      * @return array<string, string>
      */
     protected function casts(): array
@@ -46,5 +47,21 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the user cars for the user.
+     */
+    public function userCars()
+    {
+        return $this->hasMany(UserCar::class);
+    }
+
+    /** 
+     * Get the rides for the user through user cars
+     */
+    public function rides()
+    {
+        return $this->hasManyThrough(Ride::class, UserCar::class);
     }
 }

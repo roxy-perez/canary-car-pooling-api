@@ -10,6 +10,6 @@ interface UserRepositoryInterface
     public function findById($id);
     public function findByEmail($email): ?User;
     public function create(array $data);
-    public function update(array $data, $id);
+    public function update($id, array $data,);
     public function delete($id);
 }

@@ -13,7 +13,7 @@ class UserRepository implements UserRepositoryInterface
     }
     public function findById($id)
     {
-        return User::find($id);
+        return User::findOrFail($id);
     }
     public function findByEmail($email): ?User
     {
@@ -23,9 +23,11 @@ class UserRepository implements UserRepositoryInterface
     {
         return User::create($data);
     }
-    public function update(array $data, $id)
+    public function update($id, array $data)
     {
-        return User::find($id)->update($data);
+        $user = User::findOrFail($id);
+        $user->update($data);
+        return $user;
     }
     public function delete($id)
     {

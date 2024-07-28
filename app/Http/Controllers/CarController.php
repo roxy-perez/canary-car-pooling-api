@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use App\Classes\ApiResponseClass;
 use Illuminate\Routing\Controller;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\CarResource;
 use App\Http\Requests\StoreCarRequest;
@@ -13,16 +14,18 @@ use App\Interfaces\CarRepositoryInterface;
 
 class CarController extends Controller
 {
-    private  CarRepositoryInterface $carRepository;
+    use AuthorizesRequests;
+
+    private CarRepositoryInterface $carRepository;
+
     public function __construct(CarRepositoryInterface $carRepository)
     {
         $this->carRepository = $carRepository;
     }
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
+        $this->authorize('viewAny', Car::class);
         $data = $this->carRepository->index();
         return ApiResponseClass::sendResponse(CarResource::collection($data), '', 200);
     }
@@ -40,20 +43,15 @@ class CarController extends Controller
      */
     public function store(StoreCarRequest $request)
     {
-        $data = [
-            'name' => $request->name,
-            'make' => $request->make,
-            'model' => $request->model,
-            'year' => $request->year,
-            'comfort_level' => $request->comfort_level
-        ];
-
+        $this->authorize('create', Car::class);
+        $data = $request->validated();
         DB::beginTransaction();
         try {
             $car = $this->carRepository->store($data);
             DB::commit();
             return ApiResponseClass::sendResponse(new CarResource($car), 'Car created successfully', 201);
         } catch (\Exception $ex) {
+            DB::rollBack();
             return ApiResponseClass::rollback($ex);
         }
     }
@@ -64,15 +62,8 @@ class CarController extends Controller
     public function show($id)
     {
         $car = $this->carRepository->getById($id);
+        $this->authorize('view', $car);
         return ApiResponseClass::sendResponse(new CarResource($car), '', 200);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Car $car)
-    {
-        //
     }
 
     /**
@@ -80,19 +71,16 @@ class CarController extends Controller
      */
     public function update(UpdateCarRequest $request, $id)
     {
-        $updateData = [
-            'name' => $request->name,
-            'make' => $request->make,
-            'model' => $request->model,
-            'year' => $request->year,
-            'comfort_level' => $request->comfort_level
-        ];
+        $car = $this->carRepository->getById($id);
+        $this->authorize('update', $car);
+        $data = $request->validated();
         DB::beginTransaction();
         try {
-            $this->carRepository->update($updateData, $id);
+            $this->carRepository->update($data, $id);
             DB::commit();
             return ApiResponseClass::sendResponse('Car updated successfully', 201);
         } catch (\Exception $ex) {
+            DB::rollBack();
             return ApiResponseClass::rollback($ex);
         }
     }
@@ -102,6 +90,8 @@ class CarController extends Controller
      */
     public function destroy($id)
     {
+        $car = $this->carRepository->getById($id);
+        $this->authorize('delete', $car);
         $this->carRepository->delete($id);
         return ApiResponseClass::sendResponse('Car deleted successfully', 204);
     }
