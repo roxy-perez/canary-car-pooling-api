@@ -6,10 +6,12 @@ use Illuminate\Support\ServiceProvider;
 use App\Repositories\CarRepository;
 use App\Repositories\MunicipioRepository;
 use App\Repositories\ProvinciaRepository;
+use App\Repositories\RideRepository;
 use App\Repositories\UserRepository;
 use App\Interfaces\CarRepositoryInterface;
 use App\Interfaces\MunicipioRepositoryInterface;
 use App\Interfaces\ProvinciaRepositoryInterface;
+use App\Interfaces\RideRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -38,6 +40,7 @@ class RepositoryServiceProvider extends ServiceProvider
             UserRepositoryInterface::class,
             UserRepository::class
         );
+        $this->app->bind(RideRepositoryInterface::class, RideRepository::class);
     }
 
     /**

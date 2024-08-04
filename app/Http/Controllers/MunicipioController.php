@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Municipio;
-use App\Classes\ApiResponseClass;
+use App\Classes\ApiResponseHelper;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\MunicipioResource;
@@ -25,7 +25,7 @@ class MunicipioController extends Controller
     public function index()
     {
         $data = $this->municipioRepository->index();
-        return ApiResponseClass::sendResponse(MunicipioResource::collection($data), '', 200);
+        return ApiResponseHelper::sendResponse(MunicipioResource::collection($data), '', 200);
     }
 
     /**
@@ -50,10 +50,10 @@ class MunicipioController extends Controller
         try {
             $munipio = $this->municipioRepository->store($details);
             DB::commit();
-            return ApiResponseClass::sendResponse(new MunicipioResource($munipio), 'Municipio created successfully', 201);
+            return ApiResponseHelper::sendResponse(new MunicipioResource($munipio), 'Municipio created successfully', 201);
         } catch (\Exception $ex) {
             DB::rollBack();
-            return ApiResponseClass::rollback($ex);
+            return ApiResponseHelper::rollback($ex);
         }
     }
 
@@ -63,7 +63,7 @@ class MunicipioController extends Controller
     public function show(Municipio $municipio)
     {
         $municipio = $this->municipioRepository->getById($municipio->id);
-        return ApiResponseClass::sendResponse(new MunicipioResource($municipio), '', 200);
+        return ApiResponseHelper::sendResponse(new MunicipioResource($municipio), '', 200);
     }
 
     /**
@@ -88,10 +88,10 @@ class MunicipioController extends Controller
         try {
             $this->municipioRepository->update($updateDetails, $id);
             DB::commit();
-            return ApiResponseClass::sendResponse('Municipio updated successfully', '', 201);
+            return ApiResponseHelper::sendResponse('Municipio updated successfully', '', 201);
         } catch (\Exception $ex) {
             DB::rollBack();
-            return ApiResponseClass::rollback($ex);
+            return ApiResponseHelper::rollback($ex);
         }
     }
 
@@ -101,6 +101,6 @@ class MunicipioController extends Controller
     public function destroy($id)
     {
         $this->municipioRepository->delete($id);
-        return ApiResponseClass::sendResponse([], 'Municipio deleted successfully', 204);
+        return ApiResponseHelper::sendResponse([], 'Municipio deleted successfully', 204);
     }
 }

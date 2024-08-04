@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
             MunicipioSeeder::class,
             LuggageSizeSeeder::class,
             CarSeeder::class,
+            RoleSeeder::class,
+            UserSeeder::class,
+            AdminUserSeeder::class,
         ]);
     }
 }

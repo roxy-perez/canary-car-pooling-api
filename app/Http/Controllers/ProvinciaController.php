@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Provincia;
-use App\Classes\ApiResponseClass;
+use App\Classes\ApiResponseHelper;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreProvinciaRequest;
@@ -23,7 +23,7 @@ class ProvinciaController extends Controller
     public function index()
     {
         $data = $this->provinciaRepository->index();
-        return ApiResponseClass::sendResponse($data, '', 200);
+        return ApiResponseHelper::sendResponse($data, '', 200);
     }
 
     /**
@@ -47,10 +47,10 @@ class ProvinciaController extends Controller
         try {
             $provincia = $this->provinciaRepository->store($details);
             DB::commit();
-            return ApiResponseClass::sendResponse($provincia, 'Provincia created successfully', 201);
+            return ApiResponseHelper::sendResponse($provincia, 'Provincia created successfully', 201);
         } catch (\Exception $ex) {
             DB::rollBack();
-            return ApiResponseClass::rollback($ex);
+            return ApiResponseHelper::rollback($ex);
         }
     }
 
@@ -83,10 +83,10 @@ class ProvinciaController extends Controller
         try {
             $provincia = $this->provinciaRepository->update($details, $id);
             DB::commit();
-            return ApiResponseClass::sendResponse('Provincia updated successfully', 201);
+            return ApiResponseHelper::sendResponse('Provincia updated successfully', 201);
         } catch (\Exception $ex) {
             DB::rollBack();
-            return ApiResponseClass::rollback($ex);
+            return ApiResponseHelper::rollback($ex);
         }
     }
 
@@ -99,10 +99,10 @@ class ProvinciaController extends Controller
         try {
             $this->provinciaRepository->delete($id);
             DB::commit();
-            return ApiResponseClass::sendResponse('Provincia deleted successfully', 204);
+            return ApiResponseHelper::sendResponse('Provincia deleted successfully', 204);
         } catch (\Exception $ex) {
             DB::rollBack();
-            return ApiResponseClass::rollback($ex);
+            return ApiResponseHelper::rollback($ex);
         }
     }
 }

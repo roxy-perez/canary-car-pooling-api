@@ -8,7 +8,7 @@ use App\Http\Requests\StoreLuggageSizeRequest;
 use App\Http\Requests\UpdateLuggageSizeRequest;
 use App\Http\Resources\LuggageSizeResource;
 use App\Models\LuggageSize;
-use App\Classes\ApiResponseClass;
+use App\Classes\ApiResponseHelper;
 use Illuminate\Support\Facades\DB;
 
 class LuggageSizeController extends Controller
@@ -16,13 +16,13 @@ class LuggageSizeController extends Controller
     public function index()
     {
         $data = LuggageSize::all();
-        return ApiResponseClass::sendResponse(LuggageSizeResource::collection($data), '', 200);
+        return ApiResponseHelper::sendResponse(LuggageSizeResource::collection($data), '', 200);
     }
 
     public function show($id)
     {
         $luggageSize = LuggageSize::findOrFail($id);
-        return ApiResponseClass::sendResponse(new LuggageSizeResource($luggageSize), '', 200);
+        return ApiResponseHelper::sendResponse(new LuggageSizeResource($luggageSize), '', 200);
     }
 
     public function store(StoreLuggageSizeRequest $request)
@@ -32,9 +32,9 @@ class LuggageSizeController extends Controller
         try {
             $luggageSize = LuggageSize::create($data);
             DB::commit();
-            return ApiResponseClass::sendResponse(new LuggageSizeResource($luggageSize), 'Luggage Size created successfully', 201);
+            return ApiResponseHelper::sendResponse(new LuggageSizeResource($luggageSize), 'Luggage Size created successfully', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            return ApiResponseHelper::rollback($ex);
         }
     }
 
@@ -46,15 +46,15 @@ class LuggageSizeController extends Controller
             $luggageSize = LuggageSize::findOrFail($id);
             $luggageSize->update($data);
             DB::commit();
-            return ApiResponseClass::sendResponse('Luggage Size updated successfully', 201);
+            return ApiResponseHelper::sendResponse('Luggage Size updated successfully', 201);
         } catch (\Exception $ex) {
-            return ApiResponseClass::rollback($ex);
+            return ApiResponseHelper::rollback($ex);
         }
     }
 
     public function destroy($id)
     {
         LuggageSize::destroy($id);
-        return ApiResponseClass::sendResponse('Luggage Size deleted successfully', 204);
+        return ApiResponseHelper::sendResponse('Luggage Size deleted successfully', 204);
     }
 }

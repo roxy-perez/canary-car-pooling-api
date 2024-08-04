@@ -9,6 +9,7 @@ class LuggageSizeSeeder extends Seeder
 {
     public function run()
     {
+        LuggageSize::truncate();
         $sizes = [
             ['size' => 'Small'],
             ['size' => 'Medium'],

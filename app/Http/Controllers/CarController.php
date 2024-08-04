@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Car;
-use App\Classes\ApiResponseClass;
+use App\Classes\ApiResponseHelper;
 use Illuminate\Routing\Controller;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +27,7 @@ class CarController extends Controller
     {
         $this->authorize('viewAny', Car::class);
         $data = $this->carRepository->index();
-        return ApiResponseClass::sendResponse(CarResource::collection($data), '', 200);
+        return ApiResponseHelper::sendResponse(CarResource::collection($data), '', 200);
     }
 
     /**
@@ -49,10 +49,10 @@ class CarController extends Controller
         try {
             $car = $this->carRepository->store($data);
             DB::commit();
-            return ApiResponseClass::sendResponse(new CarResource($car), 'Car created successfully', 201);
+            return ApiResponseHelper::sendResponse(new CarResource($car), 'Car created successfully', 201);
         } catch (\Exception $ex) {
             DB::rollBack();
-            return ApiResponseClass::rollback($ex);
+            return ApiResponseHelper::rollback($ex);
         }
     }
 
@@ -63,7 +63,7 @@ class CarController extends Controller
     {
         $car = $this->carRepository->getById($id);
         $this->authorize('view', $car);
-        return ApiResponseClass::sendResponse(new CarResource($car), '', 200);
+        return ApiResponseHelper::sendResponse(new CarResource($car), '', 200);
     }
 
     /**
@@ -78,10 +78,10 @@ class CarController extends Controller
         try {
             $this->carRepository->update($data, $id);
             DB::commit();
-            return ApiResponseClass::sendResponse('Car updated successfully', 201);
+            return ApiResponseHelper::sendResponse('Car updated successfully', 201);
         } catch (\Exception $ex) {
             DB::rollBack();
-            return ApiResponseClass::rollback($ex);
+            return ApiResponseHelper::rollback($ex);
         }
     }
 
@@ -93,6 +93,6 @@ class CarController extends Controller
         $car = $this->carRepository->getById($id);
         $this->authorize('delete', $car);
         $this->carRepository->delete($id);
-        return ApiResponseClass::sendResponse('Car deleted successfully', 204);
+        return ApiResponseHelper::sendResponse('Car deleted successfully', 204);
     }
 }

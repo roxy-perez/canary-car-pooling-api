@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ApiResponseClass
+class ApiResponseHelper
 {
     public static function rollback($e, $message = 'Something went wrong! Process not completed')
     {
@@ -16,8 +16,8 @@ class ApiResponseClass
 
     public static function throw($e, $message = "Something went wrong! Process not completed")
     {
-        Log::info($e);
-        throw new HttpResponseException(response()->json(["message" => $message], 500));
+        Log::error($e);
+        throw new HttpResponseException(response()->json(['success' => false, 'message' => $message], 500));
     }
 
     public static function sendResponse($result, $message, $code = 200)
