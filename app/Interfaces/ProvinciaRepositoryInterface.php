@@ -10,4 +10,7 @@ interface ProvinciaRepositoryInterface
     public function store(array $data);
     public function update(array $data, $code);
     public function delete($code);
+    public function getMunicipios($provincia);
 }
+
+

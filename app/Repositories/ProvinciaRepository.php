@@ -36,4 +36,9 @@ class ProvinciaRepository implements ProvinciaRepositoryInterface
     {
         Provincia::destroy($id);
     }
+
+    public function getMunicipios($provincia)
+    {
+        return Provincia::where('code', $provincia)->get();
+    }
 }
